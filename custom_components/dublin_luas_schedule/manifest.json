@@ -1,0 +1,15 @@
+{
+    "domain": "dublin_luas_schedule",
+    "name": "Dublin Luas Schedule",
+    "version": "1.0.0",
+    "documentation": "https://github.com/williamcmwan/dublin-luas-schedule-hacs",
+    "issue_tracker": "https://github.com/williamcmwan/dublin-luas-schedule-hacs/issues",
+    "codeowners": [
+        "@williamcmwan"
+    ],
+    "requirements": [],
+    "dependencies": [],
+    "iot_class": "cloud_polling",
+    "integration_type": "hub",
+    "config_flow": true
+}

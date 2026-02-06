@@ -1,0 +1,23 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Select Luas Line",
+                "description": "Choose the Luas line for your stop.",
+                "data": {
+                    "line": "Luas Line"
+                }
+            },
+            "stop": {
+                "title": "Select Stop",
+                "description": "Choose your Luas stop from {line}.",
+                "data": {
+                    "stop": "Stop"
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "This stop is already configured."
+        }
+    }
+}
