@@ -1,7 +1,7 @@
 # Dublin Luas Schedule
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/release/williamcmwan/dublin-luas-schedule-hacs.svg)](https://github.com/williamcmwan/dublin-luas-schedule-hacs/releases)
+[![GitHub Release](https://img.shields.io/github/release/william88987/dublin-luas-schedule-hacs.svg)](https://github.com/william88987/dublin-luas-schedule-hacs/releases)
 
 A Home Assistant custom integration for displaying real-time Dublin Luas tram schedules.
 
@@ -20,7 +20,7 @@ A Home Assistant custom integration for displaying real-time Dublin Luas tram sc
 1. Open HACS in Home Assistant
 2. Click the three dots in the top right corner
 3. Select "Custom repositories"
-4. Add `https://github.com/williamcmwan/dublin-luas-schedule-hacs` with category "Integration"
+4. Add `https://github.com/william88987/dublin-luas-schedule-hacs` with category "Integration"
 5. Click "Install"
 6. Restart Home Assistant
 
