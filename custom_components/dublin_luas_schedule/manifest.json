@@ -8,9 +8,7 @@
         "@william88987"
     ],
     "requirements": [],
-    "dependencies": [
-        "frontend"
-    ],
+    "dependencies": [],
     "iot_class": "cloud_polling",
     "integration_type": "hub",
     "config_flow": true

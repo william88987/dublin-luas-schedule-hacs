@@ -5,7 +5,6 @@ import logging
 import shutil
 from pathlib import Path
 
-from homeassistant.components.frontend import add_extra_js_url
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -25,36 +24,51 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Dublin Luas Schedule component."""
     hass.data.setdefault(DOMAIN, {})
 
-    # Copy the Lovelace card JS to /config/www/community/ and register it
-    try:
-        await _copy_card_to_www(hass)
-
-        card_url = f"/hacsfiles/{COMMUNITY_DIR_NAME}/{CARD_FILENAME}"
-        add_extra_js_url(hass, card_url)
-
-        _LOGGER.info(
-            "Registered Luas Schedule card at %s", card_url
-        )
-    except Exception:  # noqa: BLE001
-        _LOGGER.exception("Failed to copy Luas Schedule card to www/community")
+    # Copy the Lovelace card JS to /config/www/community/dublin-luas-schedule/
+    await _install_card(hass)
 
     return True
 
 
-async def _copy_card_to_www(hass: HomeAssistant) -> None:
-    """Copy the Lovelace card JS to /config/www/community/dublin-luas-schedule/."""
+async def _install_card(hass: HomeAssistant) -> None:
+    """Copy the card JS to www/community and register as a Lovelace resource."""
     source = Path(__file__).parent / "www" / CARD_FILENAME
     dest_dir = Path(hass.config.path("www")) / "community" / COMMUNITY_DIR_NAME
     dest_file = dest_dir / CARD_FILENAME
 
-    def _do_copy() -> None:
-        dest_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(str(source), str(dest_file))
-
-    await hass.async_add_executor_job(_do_copy)
-    _LOGGER.info(
-        "Copied %s to %s", CARD_FILENAME, dest_dir
+    _LOGGER.debug(
+        "Luas card install: source=%s, dest=%s, source_exists=%s",
+        source, dest_file, source.exists(),
     )
+
+    if not source.exists():
+        _LOGGER.error("Luas card source file not found: %s", source)
+        return
+
+    try:
+        def _do_copy() -> None:
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(str(source), str(dest_file))
+
+        await hass.async_add_executor_job(_do_copy)
+        _LOGGER.info("Copied %s -> %s", CARD_FILENAME, dest_file)
+    except Exception:
+        _LOGGER.exception("Failed to copy Luas card JS to %s", dest_dir)
+        return
+
+    # Register as a Lovelace resource so it loads automatically
+    card_url = f"/hacsfiles/{COMMUNITY_DIR_NAME}/{CARD_FILENAME}"
+    try:
+        from homeassistant.components.frontend import add_extra_js_url  # noqa: E501
+
+        add_extra_js_url(hass, card_url)
+        _LOGGER.info("Registered Luas Schedule card resource at %s", card_url)
+    except Exception:
+        _LOGGER.warning(
+            "Could not auto-register card resource. "
+            "Please manually add '%s' as a Lovelace resource (JavaScript module).",
+            card_url,
+        )
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -81,9 +95,3 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
-
-
-
-
-
-
