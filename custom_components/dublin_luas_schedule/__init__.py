@@ -18,57 +18,13 @@ PLATFORMS: list[Platform] = [Platform.SENSOR]
 
 CARD_FILENAME = "luas-schedule-card.js"
 COMMUNITY_DIR_NAME = "dublin-luas-schedule"
+CARD_URL = f"/hacsfiles/{COMMUNITY_DIR_NAME}/{CARD_FILENAME}"
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Dublin Luas Schedule component."""
     hass.data.setdefault(DOMAIN, {})
-
-    # Copy the Lovelace card JS to /config/www/community/dublin-luas-schedule/
-    await _install_card(hass)
-
     return True
-
-
-async def _install_card(hass: HomeAssistant) -> None:
-    """Copy the card JS to www/community and register as a Lovelace resource."""
-    source = Path(__file__).parent / "www" / CARD_FILENAME
-    dest_dir = Path(hass.config.path("www")) / "community" / COMMUNITY_DIR_NAME
-    dest_file = dest_dir / CARD_FILENAME
-
-    _LOGGER.debug(
-        "Luas card install: source=%s, dest=%s, source_exists=%s",
-        source, dest_file, source.exists(),
-    )
-
-    if not source.exists():
-        _LOGGER.error("Luas card source file not found: %s", source)
-        return
-
-    try:
-        def _do_copy() -> None:
-            dest_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(str(source), str(dest_file))
-
-        await hass.async_add_executor_job(_do_copy)
-        _LOGGER.info("Copied %s -> %s", CARD_FILENAME, dest_file)
-    except Exception:
-        _LOGGER.exception("Failed to copy Luas card JS to %s", dest_dir)
-        return
-
-    # Register as a Lovelace resource so it loads automatically
-    card_url = f"/hacsfiles/{COMMUNITY_DIR_NAME}/{CARD_FILENAME}"
-    try:
-        from homeassistant.components.frontend import add_extra_js_url  # noqa: E501
-
-        add_extra_js_url(hass, card_url)
-        _LOGGER.info("Registered Luas Schedule card resource at %s", card_url)
-    except Exception:
-        _LOGGER.warning(
-            "Could not auto-register card resource. "
-            "Please manually add '%s' as a Lovelace resource (JavaScript module).",
-            card_url,
-        )
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -84,9 +40,73 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
+    # Register the Lovelace card (only once across all config entries)
+    if not hass.data[DOMAIN].get("card_registered"):
+        hass.data[DOMAIN]["card_registered"] = True
+        await _copy_card_to_www(hass)
+        await _register_lovelace_resource(hass)
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
+
+
+async def _copy_card_to_www(hass: HomeAssistant) -> None:
+    """Copy the Lovelace card JS to /config/www/community/dublin-luas-schedule/."""
+    source = Path(__file__).parent / "www" / CARD_FILENAME
+    dest_dir = Path(hass.config.path("www")) / "community" / COMMUNITY_DIR_NAME
+    dest_file = dest_dir / CARD_FILENAME
+
+    if not source.exists():
+        _LOGGER.error("Luas card source not found: %s", source)
+        return
+
+    try:
+
+        def _do_copy() -> None:
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(str(source), str(dest_file))
+
+        await hass.async_add_executor_job(_do_copy)
+        _LOGGER.info("Copied %s to %s", CARD_FILENAME, dest_file)
+    except Exception:
+        _LOGGER.exception("Failed to copy Luas card JS")
+
+
+async def _register_lovelace_resource(hass: HomeAssistant) -> None:
+    """Register the card as a Lovelace dashboard resource (same as HACS does)."""
+    try:
+        # Access the Lovelace resources collection (same API that HACS uses)
+        lovelace_data = hass.data.get("lovelace")
+        if not lovelace_data:
+            _LOGGER.warning("Lovelace not loaded yet, cannot register resource")
+            return
+
+        resources = getattr(lovelace_data, "resources", None)
+        if resources is None:
+            _LOGGER.warning("Lovelace resources not available")
+            return
+
+        # Check if our resource is already registered
+        existing_items = resources.async_items()
+        for item in existing_items:
+            if COMMUNITY_DIR_NAME in item.get("url", ""):
+                _LOGGER.info("Luas card resource already registered")
+                return
+
+        # Register the resource (same method HACS uses)
+        await resources.async_create_item(
+            {"res_type": "module", "url": CARD_URL}
+        )
+        _LOGGER.info("Registered Luas card as Lovelace resource: %s", CARD_URL)
+
+    except Exception:
+        _LOGGER.exception(
+            "Could not auto-register Lovelace resource. "
+            "Please manually add '%s' as a JavaScript module resource in "
+            "Settings > Dashboards > Resources.",
+            CARD_URL,
+        )
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
