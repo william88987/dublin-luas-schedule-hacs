@@ -24,6 +24,20 @@ COMMUNITY_DIR_NAME = "dublin-luas-schedule"
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the Dublin Luas Schedule component."""
     hass.data.setdefault(DOMAIN, {})
+
+    # Copy the Lovelace card JS to /config/www/community/ and register it
+    try:
+        await _copy_card_to_www(hass)
+
+        card_url = f"/local/community/{COMMUNITY_DIR_NAME}/{CARD_FILENAME}"
+        add_extra_js_url(hass, card_url)
+
+        _LOGGER.info(
+            "Registered Luas Schedule card at %s", card_url
+        )
+    except Exception:  # noqa: BLE001
+        _LOGGER.exception("Failed to copy Luas Schedule card to www/community")
+
     return True
 
 
@@ -55,20 +69,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator
-
-    # Copy the Lovelace card JS to /config/www/community/ and register it
-    if DOMAIN not in hass.data.get("frontend_extra_module_registered", set()):
-        hass.data.setdefault("frontend_extra_module_registered", set()).add(DOMAIN)
-
-        await _copy_card_to_www(hass)
-
-        # Register as a frontend resource so Lovelace automatically loads it
-        card_url = f"/local/community/{COMMUNITY_DIR_NAME}/{CARD_FILENAME}"
-        add_extra_js_url(hass, card_url)
-
-        _LOGGER.info(
-            "Registered Luas Schedule card at %s", card_url
-        )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
