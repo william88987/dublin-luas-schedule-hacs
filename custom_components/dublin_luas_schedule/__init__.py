@@ -29,7 +29,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     try:
         await _copy_card_to_www(hass)
 
-        card_url = f"/local/community/{COMMUNITY_DIR_NAME}/{CARD_FILENAME}"
+        card_url = f"/local/{COMMUNITY_DIR_NAME}/{CARD_FILENAME}"
         add_extra_js_url(hass, card_url)
 
         _LOGGER.info(
@@ -44,7 +44,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 async def _copy_card_to_www(hass: HomeAssistant) -> None:
     """Copy the Lovelace card JS to /config/www/community/dublin-luas-schedule/."""
     source = Path(__file__).parent / "www" / CARD_FILENAME
-    dest_dir = Path(hass.config.path("www")) / "community" / COMMUNITY_DIR_NAME
+    dest_dir = Path(hass.config.path("www")) / COMMUNITY_DIR_NAME
     dest_file = dest_dir / CARD_FILENAME
 
     def _do_copy() -> None:
