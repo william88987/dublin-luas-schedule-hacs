@@ -21,8 +21,9 @@ A Home Assistant custom integration for displaying real-time Dublin Luas tram sc
 2. Click the three dots in the top right corner
 3. Select "Custom repositories"
 4. Add `https://github.com/william88987/dublin-luas-schedule-hacs` with category "Integration"
-5. Click "Install"
-6. Restart Home Assistant
+5. Search for "Dublin Luas Schedule"
+6. Click "Download"
+7. Restart Home Assistant
 
 ### Manual Installation
 
@@ -35,8 +36,17 @@ A Home Assistant custom integration for displaying real-time Dublin Luas tram sc
 1. Go to **Settings** → **Devices & Services**
 2. Click **+ Add Integration**
 3. Search for "Dublin Luas Schedule"
+
+   ![Add Integration](screen-shots/add-integration.png)
+
 4. Select your Luas line (Red or Green)
+
+   ![Select Line](screen-shots/select-line.png)
+
 5. Select your stop
+
+   ![Select Stop](screen-shots/select-stop.png)
+
 6. Done! Sensors will be created automatically
 
 You can add multiple stops by repeating the configuration process.
