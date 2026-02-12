@@ -139,6 +139,8 @@ entities:
 
 This integration includes a custom Lovelace card with configurable views.
 
+![custom-luas-schedule-card.png](screen-shots/custom-luas-schedule-card.png)
+
 ### Adding the Card Resource
 
 When installed via HACS, the card file and resource are **registered automatically**.
@@ -183,6 +185,8 @@ show_outbound: true
 ## CarPlay Support
 
 The Home Assistant Companion app (iOS 2024.1+) supports CarPlay. To add Luas schedule to CarPlay:
+
+![carplay.jpg](screen-shots/carplay.jpg)
 
 1. Open the Home Assistant Companion app on your iPhone
 2. Go to **Settings** → **Companion App** → **CarPlay**
