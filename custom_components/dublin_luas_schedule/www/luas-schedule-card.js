@@ -507,7 +507,7 @@ window.customCards.push({
   preview: true,
 });
 
-console.info('%c LUAS-SCHEDULE-CARD %c v1.2.0 ',
+console.info('%c LUAS-SCHEDULE-CARD %c v1.0.0 ',
   'color: white; background: #03a9f4; font-weight: bold;',
   'color: #03a9f4; background: white; font-weight: bold;'
 );
