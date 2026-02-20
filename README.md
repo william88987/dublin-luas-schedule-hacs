@@ -143,11 +143,16 @@ This integration includes a custom Lovelace card with configurable views.
 
 ### Adding the Card Resource
 
-When installed via HACS, the card file and resource are **registered automatically**.
+**Important:** To prevent conflict with other Lovelace resources, the card resource must be added manually.
 
-The card is available at: `/hacsfiles/dublin_luas_schedule/luas-schedule-card.js`
+The card is available at: `/hacsfiles/dublin-luas-schedule/luas-schedule-card.js`
 
-> **Note**: If the card doesn't appear, go to **Settings** → **Dashboards** → **Resources** and verify the resource is listed. If not, add it manually with the URL above.
+1. In Home Assistant, go to **Settings** → **Dashboards** → **Resources** (You may need to enable "Advanced Mode" in your user profile first).
+2. Click **+ Add Resource**.
+3. Set the URL to: `/hacsfiles/dublin-luas-schedule/luas-schedule-card.js`
+4. Set the Resource type to: **JavaScript Module**.
+5. Click **Create**.
+6. Refresh your browser or clear the cache if the card does not appear immediately.
 
 ### Using the Card
 

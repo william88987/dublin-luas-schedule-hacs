@@ -40,11 +40,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
-    # Register the Lovelace card (only once across all config entries)
+    # Copy the Lovelace card (only once across all config entries)
     if not hass.data[DOMAIN].get("card_registered"):
         hass.data[DOMAIN]["card_registered"] = True
         await _copy_card_to_www(hass)
-        await _register_lovelace_resource(hass)
+        # We no longer auto-register the Lovelace resource due to race conditions
+        # that could cause other resources to be overwritten/removed.
+        # Users must add it manually or via HACS.
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -71,42 +73,6 @@ async def _copy_card_to_www(hass: HomeAssistant) -> None:
         _LOGGER.info("Copied %s to %s", CARD_FILENAME, dest_file)
     except Exception:
         _LOGGER.exception("Failed to copy Luas card JS")
-
-
-async def _register_lovelace_resource(hass: HomeAssistant) -> None:
-    """Register the card as a Lovelace dashboard resource (same as HACS does)."""
-    try:
-        # Access the Lovelace resources collection (same API that HACS uses)
-        lovelace_data = hass.data.get("lovelace")
-        if not lovelace_data:
-            _LOGGER.warning("Lovelace not loaded yet, cannot register resource")
-            return
-
-        resources = getattr(lovelace_data, "resources", None)
-        if resources is None:
-            _LOGGER.warning("Lovelace resources not available")
-            return
-
-        # Check if our resource is already registered
-        existing_items = resources.async_items()
-        for item in existing_items:
-            if COMMUNITY_DIR_NAME in item.get("url", ""):
-                _LOGGER.info("Luas card resource already registered")
-                return
-
-        # Register the resource (same method HACS uses)
-        await resources.async_create_item(
-            {"res_type": "module", "url": CARD_URL}
-        )
-        _LOGGER.info("Registered Luas card as Lovelace resource: %s", CARD_URL)
-
-    except Exception:
-        _LOGGER.exception(
-            "Could not auto-register Lovelace resource. "
-            "Please manually add '%s' as a JavaScript module resource in "
-            "Settings > Dashboards > Resources.",
-            CARD_URL,
-        )
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
