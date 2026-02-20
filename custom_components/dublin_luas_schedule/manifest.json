@@ -1,7 +1,7 @@
 {
     "domain": "dublin_luas_schedule",
     "name": "Dublin Luas Schedule",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "documentation": "https://github.com/william88987/dublin-luas-schedule-hacs",
     "issue_tracker": "https://github.com/william88987/dublin-luas-schedule-hacs/issues",
     "codeowners": [
