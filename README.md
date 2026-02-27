@@ -137,55 +137,11 @@ entities:
 
 ## Custom Luas Schedule Card
 
-This integration includes a custom Lovelace card with configurable views.
+This integration provides the backend data for the custom Lovelace card. The frontend card has been moved to its own repository to better follow HACS best practices for Lovelace plugins.
+
+Please visit the [Dublin Luas Schedule Card repository](https://github.com/william88987/dublin_luas_schedule_card) for installation instructions, configuration options, and usage details.
 
 ![custom-luas-schedule-card.png](screen-shots/custom-luas-schedule-card.png)
-
-### Adding the Card Resource
-
-**Important:** To prevent conflict with other Lovelace resources, the card resource must be added manually.
-
-The card is available at: `/hacsfiles/dublin-luas-schedule/luas-schedule-card.js`
-
-1. In Home Assistant, go to **Settings** → **Dashboards** → **Resources** (You may need to enable "Advanced Mode" in your user profile first).
-2. Click **+ Add Resource**.
-3. Set the URL to: `/hacsfiles/dublin-luas-schedule/luas-schedule-card.js`
-4. Set the Resource type to: **JavaScript Module**.
-5. Click **Create**.
-6. Refresh your browser or clear the cache if the card does not appear immediately.
-
-### Using the Card
-
-Add the card to your dashboard via the UI editor - search for "Luas Schedule Card" in the card picker.
-
-Or manually add YAML:
-
-```yaml
-type: custom:luas-schedule-card
-entity: sensor.cherrywood_inbound_next
-view_type: full       # 'full' or 'compact'
-max_trams: 5          # 1-10
-show_inbound: true
-show_outbound: true
-```
-
-### Configuration Options
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `entity` | Required | Any Luas sensor for the stop (inbound, outbound, or status) |
-| `view_type` | `full` | `full` shows arrival times, `compact` shows only due time |
-| `max_trams` | `5` | Maximum number of trams to display per direction (1-10) |
-| `show_inbound` | `true` | Show inbound trams section |
-| `show_outbound` | `true` | Show outbound trams section |
-
-### Card Features
-
-- **Full Schedule View**: Shows destination, due time, and exact arrival time
-- **Compact View**: Condensed display with just destination and due time
-- **Visual Card Editor**: Configure all options through the UI
-- **Auto-updates**: Refreshes with your sensor data every 60 seconds
-- **Dark Mode Support**: Automatically adapts to your Home Assistant theme
 
 ## CarPlay Support
 
